@@ -1,0 +1,280 @@
+@charset "UTF-8";
+/*SCM系统主体样式*/
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+/* 清除内外边距 */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+p,
+blockquote,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+pre,
+fieldset,
+lengend,
+button,
+input,
+textarea,
+th,
+td {
+  /* table elements 表格元素 */
+  margin: 0;
+  padding: 0; }
+
+body {
+  -webkit-text-size-adjust: none; }
+
+/* 设置默认字体 */
+body,
+button,
+input,
+select,
+textarea {
+  outline: none;
+  /* for ie */
+  /*font: 12px/1 Tahoma, Helvetica, Arial, "宋体", sans-serif;*/
+  font: 12px/1 Microsoft Yahei, Tahoma, Helvetica, Arial, "\5b8b\4f53", sans-serif;
+  /* 用 ascii 字符表示，使得在任何编码下都无问题 */ }
+
+h1 {
+  font-size: 18px;
+  /* 18px / 12px = 1.5 */ }
+
+h2 {
+  font-size: 16px; }
+
+h3 {
+  font-size: 14px; }
+
+h4,
+h5,
+h6 {
+  font-size: 100%; }
+
+address,
+cite,
+dfn,
+em,
+var {
+  font-style: normal; }
+
+/* 将斜体扶正 */
+code,
+kbd,
+pre,
+samp,
+tt {
+  font-family: "Courier New", Courier, monospace; }
+
+/* 统一等宽字体 */
+small {
+  font-size: 12px; }
+
+/* 小于 12px 的中文很难阅读，让 small 正常化 */
+/* 重置列表元素 */
+ul,
+ol {
+  list-style: none; }
+
+/* 重置文本格式元素 */
+a {
+  text-decoration: none; }
+
+a:hover {
+  text-decoration: underline; }
+
+abbr[title],
+acronym[title] {
+  /* 注：1.ie6 不支持 abbr; 2.这里用了属性选择符，ie6 下无效果 */
+  border-bottom: 1px dotted;
+  cursor: help; }
+
+q:before,
+q:after {
+  content: ''; }
+
+/* 重置表单元素 */
+legend {
+  color: #000; }
+
+/* for ie6 */
+fieldset,
+img {
+  border: none; }
+
+/* img 搭车：让链接里的 img 无边框 */
+/* 注：optgroup 无法扶正 */
+button,
+input,
+select,
+textarea {
+  font-size: 100%;
+  /* 使得表单元素在 ie 下能继承字体大小 */ }
+
+/* 重置表格元素 */
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* 重置 hr */
+hr {
+  border: none;
+  height: 1px; }
+
+label {
+  font-weight: normal; }
+
+.fl {
+  float: left; }
+
+.fr {
+  float: right; }
+
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+  color: #999; }
+
+input:-moz-placeholder, textarea:-moz-placeholder {
+  color: #999; }
+
+input::-moz-placeholder, textarea::-moz-placeholder {
+  color: #999; }
+
+input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+  color: #999; }
+
+/*定义滑块*/
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px; }
+
+::-webkit-scrollbar-track-piece {
+  background-color: rgba(128, 128, 128, 0.1);
+  -webkit-border-radius: 2px; }
+
+::-webkit-scrollbar-thumb:vertical,
+::-webkit-scrollbar-thumb:horizontal {
+  background-color: rgba(128, 128, 128, 0.6);
+  -webkit-border-radius: 2px; }
+
+::-webkit-scrollbar-thumb:vertical:hover,
+::-webkit-scrollbar-thumb:horizontal:hover {
+  background-color: rgba(128, 128, 128, 0.8); }
+
+::-webkit-scrollbar-thumb:vertical:active,
+::-webkit-scrollbar-thumb:horizontal:active {
+  background-color: rgba(128, 128, 128, 0.6); }
+
+::-webkit-scrollbar-thumb:vertical {
+  height: 6px; }
+
+::-webkit-scrollbar-thumb:horizontal {
+  width: 6px; }
+
+/*通用*/
+body {
+  /*background: #e5e5e5;*/
+  font-family: "宋体" , Microsoft Yahei, Tahoma, Helvetica, Arial; }
+
+.red {
+  color: #ff0000; }
+
+.textDecoration {
+  text-decoration: underline; }
+.fl{
+  float: left;
+}
+.fr{
+  float: right;
+}
+.clearfix:after{
+    content:"";
+    display: block;
+    clear: both;
+}
+table td, table th {
+  word-break: break-all;
+  word-wrap: break-word; }
+
+.cont {
+  width: 650px;
+  margin: 0 auto;
+  color: #000;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 20px 0;
+  background: #fff;
+  min-height: 500px; }
+  .cont > .title {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center; }
+  .cont > .contractInfor {
+    margin-top: 10px; }
+    .cont > .contractInfor table {
+      width: 100%;
+      border-collapse: collapse;
+      border: none; }
+      .cont > .contractInfor table tr {
+        height: 20px; }
+      .cont > .contractInfor table td {
+        padding: 3px 0; }
+.contractInfor li{
+  line-height: 18px;
+  font-size: 12px;
+  color:#333;
+}
+.contractInfor li>label{
+  display: inline-block;
+  width: 63px;
+}
+.contractInfor ul:first-child li>label{
+  width: 85px;
+}
+  .cont .content {
+    /*margin-top: 20px;*/ }
+    .cont .content .contentTitle {
+      font-weight: bold;
+      margin-top: 15px;
+      margin-bottom: 5px; }
+    .cont .content .contentTable {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse; }
+      .cont .content .contentTable th, .cont .content .contentTable td {
+        border: 1px solid #000;
+        text-align: center;
+        /*font-weight: normal;*/
+        padding: 0 2px;
+        /*padding: 2px;*/ }
+      .cont .content .contentTable tr {
+        height: 26px; }
+      .cont .content .contentTable td {
+        text-align: center; 
+      }
+      .cont .content .contentTable tfoot td {
+        font-weight: bold; 
+      }
+  .cont .bot {
+    margin-top: 10px; }
+    .cont .bot table {
+      width: 100%;
+      border-collapse: collapse; }
+      .cont .bot table td {
+        /*border: 1px solid #000;*/
+        border:none;
+        height: 26px;
+        padding: 3px;
+        position: relative; }
