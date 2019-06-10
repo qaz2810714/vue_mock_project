@@ -19,7 +19,6 @@
             ref="addBtn"
             btnName="新增"
             btnIcon="el-icon-circle-plus-outline"
-            :btnClickFunc="addTab"
           ></pm_toolButton>
            <pm_toolButton
               ref="viewQuality"
@@ -116,13 +115,10 @@ import pm_column from "@/components/common/table/pm_column";
 import httpUtil from "@/common/utils/HttpUtil";
 import metadata from "@/common/entities/Metadata";
 import pm_pagination from "@/components/common/table/pm_pagination";
-import noteWhsInEdit from "./NoteWhsInEdit";
 import commonUtil from "@/common/utils/CommonUtils";
-import costBalanceAddManage from "@/views/cost/costBalanceAdd/CostBalanceAddManage";
 import printJS from "print-js";
 import pm_context_menu from "@/components/common/menu/pm_context_menu";
 import barCodePrint from "./BarCodePrint";
-import qualityEdit from "@/views/quality/QualityEdit"
 export default {
   mixins: [tableReload],
   components: {
@@ -213,42 +209,6 @@ export default {
     // this.$refs.pmContextMenu.addRef(el,vnode);
   },
   methods: {
-     viewQuality: function() {
-        let row = this.getSelectRow();
-        var $this = this;
-        var param = {};
-        param.wmsInCode = row.whsInCode;
-        param.page = {};
-        param.page.current = 1;
-        param.page.size = 10000;
-        var table = this;
-        httpUtil.post("quality/getQualitiesByPage", param, data => {
-          if(data.records == null || data.records.length == 0){
-              this.$layer.iframe({
-              content: {
-                content: qualityEdit, //传递的组件对象
-                parent: this, //当前的vue对象
-                data: { entity: JSON.stringify({wmsInCode:row.whsInCode}) } //props
-              },
-              area: ["600px", "360px"],
-              shadeClose: false,
-              title: "添加质检信息"
-            });
-          }else{
-              $this.$layer.iframe({
-              content: {
-                content: qualityEdit, //传递的组件对象
-                parent: $this, //当前的vue对象
-                data: { key: data.records[0].id, entity: JSON.stringify(data.records[0]) } //props
-              },
-              area: ["600px", "360px"],
-              shadeClose: false,
-              title: "编辑质检信息[" + data.records[0].wmsInCode + "]"
-              });
-          }
-        });
-
-      },
     printInfo: function() {
       let _this = this;
       let row = this.getSelectRow();
@@ -277,66 +237,6 @@ export default {
         table.dataSource = data.records;
         table.totalSize = data.total;
       },page,size);
-    },
-    //打开创建入库单 tab页
-    addTab: function() {
-      var entity = {};
-      entity.editFlag = "3";
-      const inItem = {
-        component: noteWhsInEdit,
-        propsData: { entity: entity, parentView: this },
-        name: "添加入库单"
-      };
-      this.$tab.open(inItem);
-    },
-    //打开编辑入库单 tab页
-    editTab: function(row, event) {
-      var $this = this;
-      this.$commonUtil.getEntityNoPage(
-        "wmsin/getInfoById",
-        "wmsin/getDetailListByMainId",
-        { id: row.id, mainId: row.id, bizType: 1, bizId: row.id },
-        function(entity) {
-          entity.details = entity.detailList;
-          var titleHead = "编辑";
-          if (entity.moveStatus == 2) {
-            //入库完成
-            titleHead = "查看";
-          }
-          entity.editFlag = "1";
-          $this.$tab.open({
-            component: noteWhsInEdit,
-            name: titleHead + "入库单[" + row.whsinCode + "]",
-            propsData: { key: row.id, entity, parentView: $this }
-          });
-        }
-      );
-    },
-    //打开调整入库单 tab页
-    adjustTab: function() {
-      var $this = this;
-      let row = this.getSelectRow();
-      if (row.status != 2) {
-        this.$message({
-          message: "只能调整已入库的单据!",
-          type: "fail"
-        });
-        return;
-      }
-      this.$commonUtil.getEntityNoPageWithFile(
-        "whsin/getInInfoByMainId",
-        "whsin/getInDetailByMainId",
-        "file/getFileItemInfo",
-        { id: row.id, whsinMainId: row.id, bizType: 1, bizId: row.id },
-        function(entity) {
-          entity.editFlag = "2";
-          $this.$tab.open({
-            component: noteWhsInEdit,
-            name: "调整入库单[" + row.whsinCode + "]",
-            propsData: { key: row.id, entity, parentView: $this }
-          });
-        }
-      );
     },
     //作废数据
     deleteInfo() {
@@ -418,29 +318,6 @@ export default {
         //获取表单的信息
         var table = $this.$refs.pmTable;
         $this.$commonUtil.cloudExport($this, data.records, table, "入库单列表");
-      });
-    },
-    settleInfo() {
-      var $this = this;
-      let selectRow = this.getSelectRow();
-      if (selectRow.status != 2) {
-        this.$message({
-          message: "只能结算已入库状态的单据！",
-          type: "fail"
-        });
-        return;
-      }
-      var entity = this.$commonUtil.deepClone(selectRow);
-      selectRow.whsinMainId = selectRow.id;
-      httpUtil.post("wmsin/getInDetailByMainId", selectRow, data => {
-        entity.details = data;
-        $this.wrapData(entity);
-        const costBalanceItem = {
-          component: costBalanceAddManage,
-          propsData: { entity: entity },
-          name: "新增结算单"
-        };
-        $this.$tab.open(costBalanceItem);
       });
     },
     //获取选中行

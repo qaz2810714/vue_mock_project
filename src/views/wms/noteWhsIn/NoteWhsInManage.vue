@@ -41,12 +41,6 @@
             :btnClickFunc="printInfo"
           ></pm_toolButton>
           <pm_toolButton
-            btnName="结算"
-            btnPermission="btn_settle"
-            btnIcon="el-icon-sold-out"
-            :btnClickFunc="settleInfo"
-          ></pm_toolButton>
-          <pm_toolButton
             btnName="导出"
             btnPermission="btn_export"
             btnIcon="el-icon-document"
@@ -116,7 +110,6 @@ import metadata from "@/common/entities/Metadata";
 import pm_pagination from "@/components/common/table/pm_pagination";
 import noteWhsInEdit from "./NoteWhsInEdit";
 import commonUtil from "@/common/utils/CommonUtils";
-import costBalanceAddManage from "@/views/cost/costBalanceAdd/CostBalanceAddManage";
 import printJS from "print-js";
 import pm_context_menu from "@/components/common/menu/pm_context_menu";
 export default {
@@ -405,29 +398,6 @@ export default {
         //获取表单的信息
         var table = $this.$refs.pmTable;
         $this.$commonUtil.cloudExport($this, data.content, table, "入库单列表");
-      });
-    },
-    settleInfo() {
-      var $this = this;
-      let selectRow = this.getSelectRow();
-      if (selectRow.status != 2) {
-        this.$message({
-          message: "只能结算已入库状态的单据！",
-          type: "fail"
-        });
-        return;
-      }
-      var entity = this.$commonUtil.deepClone(selectRow);
-      selectRow.whsinMainId = selectRow.id;
-      httpUtil.post("whsin/getInDetailByMainId", selectRow, data => {
-        entity.detailList = data;
-        $this.wrapData(entity);
-        const costBalanceItem = {
-          component: costBalanceAddManage,
-          propsData: { entity: entity },
-          name: "新增结算单"
-        };
-        $this.$tab.open(costBalanceItem);
       });
     },
     //获取选中行

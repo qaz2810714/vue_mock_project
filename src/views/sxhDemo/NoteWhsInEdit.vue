@@ -80,7 +80,6 @@
     import cacheUtil from "@/common/utils/CacheUtil";
     import commonUtil from "@/common/utils/CommonUtils";
     import pm_upload from "@/components/common/upload/pm_upload";
-    import costBalanceAddManage from "@/views/cost/costBalanceAdd/CostBalanceAddManage";
     import printJS from 'print-js'
     import barCodePrint from "./BarCodePrint";
     const statusEnum = {
@@ -215,18 +214,6 @@
            }
         },
         methods: {
-            settleInfo(){
-                var $this = this;
-                var submitModel =JSON.parse(JSON.stringify(this.formModel));
-                submitModel.details = this.dataSource;
-                this.wrapData(submitModel);
-				const costBalanceItem = {
-                	component: costBalanceAddManage,
-                	propsData:{entity:submitModel},
-                	name: "新增结算单",
-            	}
-            	this.$tab.open(costBalanceItem);
-            },
             wrapData(entity){
                 entity.businessNo = entity.whsInCode;
                 entity.cstId = entity.cstId;

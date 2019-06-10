@@ -59,7 +59,6 @@
                     <pm_toolButton ref='add' btnName ="保存" btnIcon ="el-icon-circle-plus-outline" :btnClickFunc ='saveInfo'></pm_toolButton>
                     <pm_toolButton ref='save' btnName ="保存并审核" btnIcon ="el-icon-circle-plus-outline" :btnClickFunc ='saveAndAuditInfo'></pm_toolButton>
                     <pm_toolButton ref='btn_print' btnName ="打印" btnIcon ="el-icon-printer" :btnClickFunc ='printInfo'></pm_toolButton>
-                    <pm_toolButton ref='cost' btnName ="结算" btnIcon ="el-icon-tickets" :btnClickFunc ='settleInfo'></pm_toolButton>
                     <pm_toolButton btnName ="关闭" btnIcon ="el-icon-error" :btnClickFunc ='closeWin'></pm_toolButton>
                 </pm_tool_bar>
             </metro_page_box_body>
@@ -97,7 +96,6 @@
     import cacheUtil from "@/common/utils/CacheUtil";
     import commonUtil from "@/common/utils/CommonUtils";
     import pm_upload from "@/components/common/upload/pm_upload";
-    import costBalanceAddManage from "@/views/cost/costBalanceAdd/CostBalanceAddManage";
     import printJS from 'print-js'
     const statusEnum = {
         STATUS_READY:1, //待入库
@@ -243,18 +241,6 @@
            }
         },
         methods: {
-            settleInfo(){
-                var $this = this;
-                var submitModel =JSON.parse(JSON.stringify(this.formModel));
-                submitModel.detailList = this.dataSource;
-                this.wrapData(submitModel);
-				const costBalanceItem = {
-                	component: costBalanceAddManage,
-                	propsData:{entity:submitModel},
-                	name: "新增结算单",
-            	}
-            	this.$tab.open(costBalanceItem);
-            },
             wrapData(entity){
                 entity.businessNo = entity.whsinCode;
                 entity.cstId = entity.cstId;

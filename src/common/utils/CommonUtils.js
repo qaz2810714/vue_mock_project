@@ -1,4 +1,3 @@
-import selectStock from "../../views/wms/stock/SelectStock"
 import httpUtil from "@/common/utils/HttpUtil";
 import cacheUtil from "@/common/utils/CacheUtil";
 import exportUtil from '@/common/utils/ExportUtil';
@@ -345,7 +344,6 @@ export default {
     }
     parent.$layer.iframe({
       content: {
-        content: selectStock, //传递的组件对象
         parent: parent, //当前的vue对象
         data: {
           selected: function (rows) {
