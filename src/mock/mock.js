@@ -3,6 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { LoginUsers, Users } from './data/user';
 import permission from './data/permission';
 import dicJson from './data/dictionary'
+import loginJson from './data/loginInfo'
 
 let _Users = Users;
 const Mock = require("mockjs")
@@ -19,6 +20,9 @@ Mock.mock(serviceUrl+'/dict/getBaseData',function(){
     "message": "处理成功",
     "data": {}
   }
+})
+Mock.mock(serviceUrl+'/user/login',function(){
+  return loginJson
 })
 
 // export default {
