@@ -109,7 +109,7 @@
     };
     export default {
         components: {metro_page, metro_page_box, metro_page_box_tool_bar,
-            metro_page_box_body, metro_pageheader,pm_search,pm_form_item,pm_toolButton, pm_tool_bar,pm_table, pm_column,pm_pagination,pm_upload,noteWhsInPrint},
+            metro_page_box_body, metro_pageheader,pm_search,pm_form_item,pm_toolButton, pm_tool_bar,pm_table, pm_column,pm_pagination,pm_upload},
         data: function() {
             var validBillAttachment=(rule, value,callback)=>{
                 var reg = /^[a-zA-Z0-9\,]+$/

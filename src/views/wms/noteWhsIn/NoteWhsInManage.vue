@@ -128,7 +128,6 @@ export default {
     pm_column,
     pm_pagination,
     pm_context_menu,
-    noteWhsInPrint
   },
   data: function() {
     return {
