@@ -1,6 +1,6 @@
 <template>
   <div class="pm_search_select">
-    <el-select filterable size="mini" :disabled='readOnly' clearable :allow-create='alllowCreate'
+    <el-select filterable size="mini" :disabled='readOnly' clearable
     @change="changeHandler" v-model="selectInfo" placeholder="请选择">
       <div class='options'>
       <el-option v-for="item in dataSource" :key="item[selectConfig.key]" :label="item[selectConfig.value]" :value="item[selectConfig.key]">
@@ -33,11 +33,7 @@ export default {
       type:Object
     },
     changeFunc:Function,
-    dicCache:null,
-    alllowCreate:{
-      type:Boolean,
-      default:false
-    }
+    dicCache:null
   },
   //自定义v-model双向绑定
   model: {
@@ -46,25 +42,6 @@ export default {
   },
   watch: {
     selectInfo: function() {
-      //输入模式
-      if(this.selectInfo !=""){
-          //如果是自动创建货主模式，且输入了字符串格式，则回传字符串 清空ID
-          if(typeof(this.selectInfo) == "string" && this.alllowCreate == true){
-            this.$emit("update:cstName", this.selectInfo);
-            this.$emit("bindEvent", null);
-            return;
-          }
-          //否则回传ID，清空字符串
-          else{
-            this.$emit("update:cstName", "");
-            this.$emit("bindEvent", this.selectInfo);
-          }
-      }
-      //清空模式，两者都清空
-      else{
-        this.$emit("update:cstName","");
-        this.$emit("bindEvent",null);
-      }
     },
     bindData:function(){
       this.setDefaultValue();
@@ -90,11 +67,6 @@ export default {
       if(this.bindData && this.dataSource.filter(data => data.id === this.bindData).length > 0){
         this.selectInfo = this.bindData;
       }
-      //当ID没匹配到时，如果不允许自动创建货主,则设置为null
-      else if(!this.alllowCreate){
-        this.selectInfo = undefined;
-      }
-      //否则直接不做处理
     },
     getCtrlConfig(){
       if(this.config && this.config.dataSource){

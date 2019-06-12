@@ -11,7 +11,7 @@
                 </el-input>           
                 <!-- 数值 -->
                 <el-input-number v-if="xtype == 'number'" size="mini" 
-                    v-bind:disabled="canRead" v-model="model[name]" clearable :min="min" :max="max" :precision='precision'>
+                    v-bind:disabled="canRead" v-model="model[name]" clearable :min="numMin" :max="numMax" :precision='precision'>
                 </el-input-number>
                 <!-- 日期 -->
                 <el-date-picker v-if="xtype == 'date'" size="mini" 
@@ -61,13 +61,11 @@
                     <pm_checkbox v-for="item in datalist" :key='item[editControl.key]' 
                     :disabled="isDisabled(item[editControl.key])"
                     :value="item[editControl.key]" :label="item[editControl.key]" :show="item[editControl.value]">
-                        <!-- <el-input type="checkbox" /> -->
                     </pm_checkbox>
                 </el-checkbox-group>
                 <!-- 高级搜索控件 -->
-                <!-- <SearchSelectButton  v-if="xtype == 'search_select_input'" :field="field"></SearchSelectButton> -->
                 <pm_search_select v-if="xtype == 'search_select_input'" :dicCache="dicCache" :config="editControl"
-                :changeFunc="changeHandler"  v-bind:readOnly='canRead' :fieldName="name" v-model="model[name]" v-bind:cstName.sync="model[autoCreateField]" :alllowCreate="alllowCreate"></pm_search_select>
+                :changeFunc="changeHandler"  v-bind:readOnly='canRead' :fieldName="name" v-model="model[name]" v-bind:cstName.sync="model[autoCreateField]"></pm_search_select>
                 <!-- textarea -->
                 <el-input v-if="xtype == 'textarea'" size="mini" clearable type="textarea" :rows='rowHeight'  placeholder="请输入内容" 
                 v-bind:disabled="canRead" v-model="model[name]"  :maxlength="maxlength"></el-input>
@@ -129,10 +127,6 @@ export default {
             type: Boolean,
             default: false
         },
-        canClickParent:{
-            type: Boolean,
-            default: false
-        },
         validObj:{
             type: Object,
             default:function() {
@@ -144,31 +138,21 @@ export default {
             }
         },
         //数字类型最大最小值
-        min:Number,
-        max:Number,
+        numMin:Number,
+        numMax:Number,
         options:Array,
         //textarea占行数
         rowHeight:{
             type:Number,
             default:3
         },
-        //多选框是否是逗号分隔处理
-        selectBatchDataSplit:{
-            type:Boolean,
-            default:false
-        },
         //radio组个数配置
         radioGroup:Array,
         watchField:String,
         disabledList:Array,//禁用列表
-        // checkedList:Array,//选中列表
         pickerOptions:{},
         canEdit: Boolean,
-        alllowCreate:{
-            type:Boolean,
-            default:false
-        },
-        autoCreateField:String
+        selectDataList:Array
     },
     computed: {
         field:function(){
@@ -226,66 +210,6 @@ export default {
                 }
             }
         },
-        calcConfig:function(val){
-            //关联控件过滤数据源
-            this.editControl = this.getCtrlConfig(val);
-            if(this.watchField == 'cstId'){
-                this.$set(this.model,this.name,val);
-            }
-            if(this.watchField == 'costType'){
-                if(val!=1){
-                    this.$set(this.model,this.name,2);
-                }else{
-                    this.$set(this.model,this.name,val);
-                }
-            }
-            if(this.watchField == 'rangeApply'){
-                if(val==1){
-                    this.$set(this.model,this.name,2);
-                }else{
-                    this.$set(this.model,this.name,1);
-
-                }
-            }
-            if(this.watchField == 'isUnifyUnitPrice'){
-                if(val==1){
-                    this.$set(this.model,this.name,0);
-                    this.readOnly=false;
-                }else{
-                    this.$set(this.model,this.name,0);
-                    this.readOnly=true;
-                }
-            }
-            if(this.watchField == 'cstType'){
-                if(val==1){
-                    this.$set(this.model,this.name,this.model.regularOtherNo);
-                    this.readOnly=false;
-                }else{
-                    this.$set(this.model,this.name,"");
-                    this.readOnly=true;
-                }
-            }
-            if(this.watchField == 'balanceType'){
-                if(val==2){
-                    this.$set(this.model,this.name,5);
-                    this.readOnly=true;
-                }else{
-                    this.$set(this.model,this.name,1);
-                    this.readOnly=false;
-                }
-            }
-            if(this.watchField == 'actMoney'){
-                if(val.trim()==''){
-                    this.$set(this.model,this.name,false);
-                }else{
-                    if(val!="0"){
-                        this.$set(this.model,this.name,true);
-                    }else{
-                        this.$set(this.model,this.name,false);
-                    }
-                }               
-            }
-        },
         getCtrlConfig(){
             var entity = this.$parent.$parent.$parent.entity;
             if(this.xtype=='search_select_input' || this.xtype=='select' || this.xtype=='select_batch' || this.xtype == 'checkbox_group'|| this.xtype=='select_batchMemo'){
@@ -333,6 +257,9 @@ export default {
             parent.rules[this.name].push(this.validObj);
         }
         this.editControl = this.getCtrlConfig();
+        if(this.selectDataList && this.selectDataList.length > 0){
+            this.datalist = this.selectDataList;
+        }
         this.$cacheUtil.addColumnListener(this.notifyObj);
         this.precision =  componentUtil.getPropPrecision(parent.entity,this.name);
     },
@@ -347,7 +274,7 @@ export default {
             model:{},
             datalist:[],
             changeFunc:Function,
-            editControl:{},
+            editControl:{key:"key",value:"value"},
             notifyObj:{
                 win:this,
                 callback:(cache,win)=>{
@@ -382,7 +309,7 @@ export default {
     width:80%;
 }
 .el-form-item{
-    margin-bottom: 0px !important;
+    margin-bottom: 22px;
 }
 .search_partition .el-select{
   width:100%;

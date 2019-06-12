@@ -3,59 +3,41 @@
     <!-- 搜索条件区域 -->
     <metro_page_box>
       <metro_page_box_body>
-        <!-- 条件区域封装控件 -->
-        <pm_search
-          :entity="config.entity"
-          ref="pm_search"
-          :btnOffset="10"
-          :packNoSearchSpan="6"
-          :hasPackNoSearch="false"
-          :packRowHeight="3"
-          :fields="searchFields"
-          v-on:getAllSearchParams="queryData"
-        ></pm_search>
+          <pm_form :model="formModel" ref="inFrom" :entity='config.entity' v-bind:formReadOnly='formReadOnly'>
+              <pm_form_item labletext="大文本框" name="textareaId" :span="6" xtype="textarea" lableWidth="90px" :rowHeight=3></pm_form_item>
+              <pm_form_item labletext="文本类型" name="textId" :span="6" xtype="text" lableWidth="90px"></pm_form_item>
+              <pm_form_item labletext="数字类型" name="numberId" :span="6" xtype="number" lableWidth="90px"></pm_form_item>
+              <pm_form_item labletext="时间类型" name="dateId" :span="6" xtype="date" lableWidth="90px"></pm_form_item>
+              <pm_form_item labletext="时间范围" name="daterangeId" :span="6" xtype="daterange" lableWidth="90px"></pm_form_item>
+              <pm_form_item labletext="单选类型" name="selectId" :span="6" xtype="select" lableWidth="90px" :selectDataList="singleSelectData"></pm_form_item>
+              <pm_form_item labletext="多选类型" name="selectBatchId" :span="6" xtype="select_batch" lableWidth="90px" :selectDataList="singleSelectData"></pm_form_item>
+              <pm_form_item labletext="测试数据配置化" name="cstId" :span="6" xtype="search_select_input" lableWidth="130px"></pm_form_item>
+              <pm_form_item labletext="测试数据配置化2" name="brandId" :span="6" xtype="select" lableWidth="135px"></pm_form_item>
+              <pm_form_item labletext="复选框" name="checkboxGroupId" :span="6" xtype="checkbox_group" lableWidth="90px"></pm_form_item>
+          </pm_form>
         <pm_tool_bar>
+          <pm_toolButton
+            ref="search"
+            btnName="搜索"
+            :btnClickFunc="search"
+            btnIcon="el-icon-circle-plus-outline"
+          ></pm_toolButton>
           <pm_toolButton
             ref="addBtn"
             btnName="新增"
             btnIcon="el-icon-circle-plus-outline"
           ></pm_toolButton>
-           <pm_toolButton
+           <!-- <pm_toolButton
               ref="viewQuality"
               btnName="维护质检信息"
               btnIcon="el-icon-circle-plus-outline"
               :btnClickFunc="viewQuality"
-            ></pm_toolButton>
+            ></pm_toolButton> -->
           <pm_toolButton
             btnName="作废"
             btnIcon="el-icon-delete"
             :btnClickFunc="deleteInfo"
           ></pm_toolButton>
-           <!-- <pm_toolButton
-            btnName="审核"
-            btnIcon="el-icon-circle-check-outline"
-            :btnClickFunc="auditInfo"
-          ></pm_toolButton> -->
-          <!-- <pm_toolButton
-            btnName="打印"
-            btnIcon="el-icon-printer"
-            :btnClickFunc="printInfo"
-          ></pm_toolButton> -->
-          <!-- <pm_toolButton
-            btnName="结算"
-            btnIcon="el-icon-sold-out"
-            :btnClickFunc="settleInfo"
-          ></pm_toolButton>
-          <pm_toolButton
-            btnName="导出"
-            btnIcon="el-icon-document"
-            :btnClickFunc="exportFunc"
-          ></pm_toolButton>
-          <pm_toolButton
-            btnName="调整"
-            btnIcon="el-icon-edit-outline"
-            :btnClickFunc="adjustTab"
-          ></pm_toolButton> -->
         </pm_tool_bar>
       </metro_page_box_body>
     </metro_page_box>
@@ -104,7 +86,7 @@ import metro_page_box from "@/components/vitems/pageContainer/metro_page_box";
 import metro_page_box_tool_bar from "@/components/vitems/pageContainer/metro_page_box_tool_bar";
 import metro_page_box_body from "@/components/vitems/pageContainer/metro_page_box_body";
 import metro_pageheader from "@/components/vitems/pageheader";
-import pm_form_render from "@/components/common/form/pm_form_render";
+import pm_form from "@/components/common/form/pm_form";
 import pm_form_item from "@/components/common/form/pm_form_item";
 import pm_search from "@/components/vitems/pageSearch/pm_search";
 import pm_toolButton from "@/components/common/button/pm_toolButton";
@@ -135,7 +117,8 @@ export default {
     pm_column,
     pm_pagination,
     pm_context_menu,
-    barCodePrint
+    barCodePrint,
+    pm_form
   },
   data: function() {
     return {
@@ -151,62 +134,16 @@ export default {
         type: Number,
         default: 0
       },
-      // 搜索区域条件
-      searchFields: [
-        {
-          displayName: "入库单号",
-          fieldName: "whsInCode",
-          xtype: "text",
-          searchLoc: "1-1-6-8-0"
-        },
-        {
-          displayName: "工艺",
-          fieldName: "techId",
-          xtype: "search_select_input",
-          searchLoc: "1-2-6-8-0"
-        },
-        {
-          displayName: "客户名称",
-          fieldName: "clientName",
-          xtype: "text",
-          searchLoc: "1-3-6-8-0"
-        },
-        {
-          displayName: "品名",
-          fieldName: "brand",
-          xtype: "text",
-          searchLoc: "1-4-6-8-0"
-        },
-        {
-          displayName: "班次",
-          fieldName: "classes",
-          xtype: "text",
-          searchLoc: "2-1-6-8-0"
-        },
-        {
-          displayName: "创建时间",
-          fieldName: "createTime",
-          xtype: "datetimerange",
-          searchLoc: "2-2-12-4-0",
-          dateBegin: "createStartTime",
-          dateEnd: "createEndTime"
-        },
-        {
-          displayName: "",
-          fieldName: "btn_search",
-          xtype: "btn",
-          searchLoc: "2-3-4-8-2"
-        }
-      ]
+      formModel:Object,
+      singleSelectData:Array
     };
   },
   mounted() {
-    // var cols = this.$refs.pmTable.getTableCols();
-    // //右键菜单指定挂接位置
-    // var tableHead = this.$refs.pmTable.$refs.multipleTable.$refs.tableHeader;
-    // var el = tableHead.$el,vnode = tableHead.$vnode;
-    // this.$refs.pmContextMenu.items = cols;
-    // this.$refs.pmContextMenu.addRef(el,vnode);
+
+  },
+  created(){
+    this.formModel = {};
+    this.singleSelectData = [{key:1,value:"aaa"},{key:2,value:"bbb"}];
   },
   methods: {
     printInfo: function() {
@@ -221,6 +158,9 @@ export default {
       //     _this.$refs.print.printDiv(entity);
       //   }
       // );
+    },
+    search:function(){
+      console.log(this.formModel);
     },
     queryData: function() {
       var $this = this;

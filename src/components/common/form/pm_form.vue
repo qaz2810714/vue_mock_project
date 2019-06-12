@@ -1,13 +1,10 @@
 <template>
-    <div class="pmForm">
-       <el-form  ref="ruleForm" class="demo-ruleForm" :inline="true">
-            <!-- <el-row> -->
+    <div class="pmForm search_partition">
+       <el-form  ref="pmForm" :inline="true">
+            <el-row>
                <slot></slot>
-           <!-- </el-row> -->
-            <!-- <el-row v-for="(row, idx) in rows" v-if="row" :key="idx">
-            </el-row> -->
+           </el-row>
        </el-form>
-       <el-button @click="getAllParams">按钮</el-button>
     </div>
 </template>
 
@@ -17,44 +14,50 @@ import cacheUtil from '@/common/utils/CacheUtil';
 import { isNull } from 'util';
 export default {
     props: {
-
+        model:Object,
+        rules:Object,
+        entity:Object,
+        change:Function,
+        formReadOnly:{type:Boolean,default:false},//全表单禁用开关
     },
     computed: {
     },
-    methods: {
-        getAllParams(){
-            var slotMap = new Map();
-            var slotChildren =[];
-            var slotPart = [];
-            console.log(this.$slots.default);
-            for (let i = 0; i< this.$slots.default.length; i++) {
-                if (this.$slots.default[i].text !== " ") {
-                    slotChildren.push(this.$slots.default[i]) // 获得 那些 插入的 按钮
+    created() {
+        this.$cacheUtil.addTableListener(this.notifyObj);
+    },
+    destroyed() {
+        this.$cacheUtil.removeTableListener(this.notifyObj);
+    },
+    data(){
+        return {
+            dicCache: cacheUtil.getDic(),
+            notifyObj:{
+                win:this,
+                callback:(cache,win)=>{
+                    win.dicCache = cache;
                 }
             }
-            console.log(slotChildren[0].componentOptions.propsData.row);
-            slotChildren.forEach(slot =>{
-                var row = slot.componentOptions.propsData.row;
-                if(slotMap.has(row)){
-                    var slotArr = [];
-                    slotArr = slotMap.get(1);
-                   slotMap.set(row,slotArr.push(slot)) 
-                }else{
-                    var slotArr = [];
-                    slotMap.set(row,slotArr.push(slot));
-                }
-            });
-            console.log(slotMap);
-            // slotChildren.forEach(function(child){
-            //     var childsMap = new Map();
-            // }
         }
     },
-    mounted() {
-       
-    },
-    data() {
-
+    methods: {
+        validate:function(curr,succ,fail){
+            this.$refs.pmform.validate(              
+                (valid,validFields) => {
+                    if (valid) {
+                        if(succ){
+                            succ(valid);
+                        }
+                    } else {
+                        if(fail){
+                            fail(valid);
+                        }else{
+                             for (var key in validFields){
+                                this.$commonUtil.valid.throwEx(curr,validFields[key][0].message);
+                             }
+                        }
+                    }
+            });
+        }
     }
 }
 </script>

@@ -3,7 +3,7 @@
         <!-- 搜索条件区域 -->
         <metro_page_box>
             <metro_page_box_body class="edit_padding">
-                <pm_form_render :model="formModel" :rules="rules" ref="inFrom" :entity='config.entity' v-bind:formReadOnly='formReadOnly'>
+                <!-- <pm_form_render :model="formModel" :rules="rules" ref="inFrom" :entity='config.entity' v-bind:formReadOnly='formReadOnly'>
                     <pm_form_item row="1" labletext="入库单号" name="whsInCode" :span="6" xtype="text" lableWidth="70px"  :readOnly='true'></pm_form_item>
                     <pm_form_item row="1" labletext="客户名称" name="clientName" :span="6" xtype="text" lableWidth="90px" required></pm_form_item>
                     <pm_form_item row="1" labletext="克重" name="gramWeight" :span="6" xtype="number" lableWidth="70px" required></pm_form_item>
@@ -14,7 +14,7 @@
                     <pm_form_item row="2" labletext="品名" name="brand" :span="6" xtype="text" lableWidth="70px" :rowHeight='2' required></pm_form_item>
                     <pm_form_item row="3" labletext="颜色" name="color" :span="6" xtype="text" lableWidth="70px" :rowHeight='2'></pm_form_item>
                     <pm_form_item row="4" labletext="备注" name="remark" :span="24" xtype="textarea" lableWidth="70px" :rowHeight='2'></pm_form_item>
-                </pm_form_render>
+                </pm_form_render> -->
                 <!-- <pm_upload ref="upload" btnIcon='el-icon-upload2' :fileList.sync='formModel.fileList'></pm_upload> -->
                 <pm_tool_bar>
                     <pm_toolButton ref="addDetail" btnName ="添加明细" btnIcon ="el-icon-circle-plus-outline" :btnClickFunc ='addDetail'></pm_toolButton>
@@ -67,7 +67,6 @@
     import metro_page_box_tool_bar from '@/components/vitems/pageContainer/metro_page_box_tool_bar';
     import metro_page_box_body from '@/components/vitems/pageContainer/metro_page_box_body';
     import metro_pageheader from '@/components/vitems/pageheader';
-    import pm_form_render from '@/components/common/form/pm_form_render';
     import pm_form_item from '@/components/common/form/pm_form_item';
     import pm_search from '@/components/vitems/pageSearch/pm_search';
     import pm_toolButton from "@/components/common/button/pm_toolButton";
