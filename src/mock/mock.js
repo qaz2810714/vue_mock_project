@@ -4,25 +4,66 @@ import { LoginUsers, Users } from './data/user';
 import permission from './data/permission';
 import dicJson from './data/dictionary'
 import loginJson from './data/loginInfo'
+import wmsInData from './data/wmsInData'
+import baseData from './data/baseData'
 
 let _Users = Users;
 const Mock = require("mockjs")
 var serviceUrl = 'http://localhost:8088/api';
-Mock.mock(serviceUrl+'/permission/getPermissionTree',function(){
-  return permission
-})
-Mock.mock(serviceUrl+'/dict/getall',function(){
-  return dicJson
-})
-Mock.mock(serviceUrl+'/dict/getBaseData',function(){
+
+function success(dataJson,message){
+  if(!message)
+    message = "处理成功"
   return {
     "code": 100,
-    "message": "处理成功",
-    "data": {}
+    "message": message,
+    "data":dataJson,
+    "errors":null
   }
+}
+function fail(dataJson,message){
+  if(!message)
+    message = "处理异常"
+    return {
+      "code": 2001,
+      "message": message,
+      "data":dataJson,
+      "errors":null
+    }
+}
+Mock.mock(serviceUrl+'/permission/getPermissionTree',function(req,res){
+  return success(permission)
 })
-Mock.mock(serviceUrl+'/user/login',function(){
-  return loginJson
+Mock.mock(serviceUrl+'/dict/getall',function(req,res){
+  return success(dicJson)
+})
+Mock.mock(serviceUrl+'/dict/getBaseData',function(req,res){
+  return success(baseData)
+})
+Mock.mock(serviceUrl+'/user/login',function(req,res){
+  let param = JSON.parse(req.body);
+  if(param.data.username == 'admin' && param.data.password == '111111')
+    return success(loginJson)
+  return fail({},"登录账号或密码错误")
+})
+Mock.mock(serviceUrl+'/wmsin/viewPageList',function(req,res){
+  let param = JSON.parse(req.body).data;
+  let data = wmsInData
+  let result = JSON.parse(JSON.stringify(data));
+  result.records = result.records.filter( a =>{
+    let r = true;
+    if(param.whsInCode){
+      r = r && a.whsInCode.includes(param.whsInCode);
+    }
+    if(param.clientName){
+      r = r && a.clientName.includes(param.clientName);
+    }
+    if(param.brand){
+      r = r && a.brand.includes(param.brand);
+    }
+    return r;
+  })
+  return success(result);
 })
 
 // export default {

@@ -59,5 +59,12 @@ export default {
             type: baseType.decimal,
             summary:true,
         },
+        gramWeight:{
+            type:baseType.decimal,
+            summary:true,
+        },
+        createTime:{
+            type:baseType.datetime
+        }
     }
 };

@@ -1,51 +1,47 @@
 {
-    "code": 100,
-    "message": "处理成功",
-    "data": {
-        "token": null,
+    "token": null,
+    "userId": 17,
+    "session": null,
+    "institutionId": 0,
+    "departmentId": 0,
+    "employeeId": 0,
+    "configUser": {
         "userId": 17,
+        "employeeId": null,
+        "name": "仓库超级管理员",
+        "nickname": null,
+        "account": "admin",
+        "password": null,
         "session": null,
-        "institutionId": 0,
-        "departmentId": 0,
-        "employeeId": 0,
-        "configUser": {
-            "userId": 17,
-            "employeeId": null,
-            "name": "仓库超级管理员",
-            "nickname": null,
-            "account": "admin",
-            "password": null,
-            "session": null,
-            "sessionExpired": null,
-            "identity": null,
-            "useStatus": null,
-            "corporationId": null,
-            "institutionId": null,
-            "departmentId": null,
-            "creator": null,
-            "createTime": null,
-            "modifier": null,
-            "modifyTime": null,
-            "valid": null,
-            "fixedUser": true
-        },
-        "instIds": null,
-        "whsIds": null,
-        "workshopIds": null,
-        "menus": null,
-        "btnPermissions": null,
-        "authorities": {
-            "": [],
-            "QualityManage": [
-                "view"
-            ],
-            "NoteWhsInGrid": [],
-            "DemoManage": [
-                "view"
-            ],
-            "TechManage": [
-                "view"
-            ]
-        }
+        "sessionExpired": null,
+        "identity": null,
+        "useStatus": null,
+        "corporationId": null,
+        "institutionId": null,
+        "departmentId": null,
+        "creator": null,
+        "createTime": null,
+        "modifier": null,
+        "modifyTime": null,
+        "valid": null,
+        "fixedUser": true
+    },
+    "instIds": null,
+    "whsIds": null,
+    "workshopIds": null,
+    "menus": null,
+    "btnPermissions": null,
+    "authorities": {
+        "": [],
+        "QualityManage": [
+            "view"
+        ],
+        "NoteWhsInGrid": [],
+        "DemoManage": [
+            "view"
+        ],
+        "TechManage": [
+            "view"
+        ]
     }
 }
