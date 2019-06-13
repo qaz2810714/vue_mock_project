@@ -6,7 +6,7 @@
       :current-page="curPage"
       :page-sizes="pageSizes"
       :page-size="realPageSize"
-      layout="total, sizes, prev, pager, next, jumper"
+      :layout="layout"
       :total="realTotal"
     ></el-pagination>
   </div>
@@ -14,7 +14,7 @@
 <script>
 export default {
   props: {
-    queryData: {
+    queryFunc: {
       required: true,
       type: Function
     },
@@ -22,19 +22,26 @@ export default {
       type: Number,
       default: 25
     },
+    layout:{
+      type:String,
+      default:"total, sizes, prev, pager, next, jumper"
+    },
     pageSizes: {
       type: Array,
       default: () => {
         return [25, 50, 100, 200];
       }
     },
-    totalSize: null
+    total: {
+      type:Number,
+      default:0
+    }
   },
   computed: {
     realTotal() {
       //判断totalSize是否为数字
-      if (this.totalSize != null) {
-        var temp = Number(this.totalSize);
+      if (this.total != null) {
+        var temp = Number(this.total);
         if (!isNaN(temp)) {
           return temp;
         } else {
@@ -52,15 +59,18 @@ export default {
     handleSizeChange(val) {
       this.realPageSize = val;
       this.curPage = 1;
-      this.queryData(this.curPage - 1, this.realPageSize);
+      this.queryFunc(this.curPage - 1, this.realPageSize);
     },
     handleCurrentChange(val) {
       this.curPage = val;
-      this.queryData(this.curPage - 1, this.realPageSize);
+      this.queryFunc(this.curPage - 1, this.realPageSize);
     },
-    refreshData(param) {
+    refreshData() {
       this.curPage = 1;
-      this.queryData(this.curPage - 1, this.realPageSize,param);
+      this.queryFunc(this.curPage - 1, this.realPageSize);
+    },
+    getCurPage(){
+      return this.curPage;
     }
   },
   data() {
