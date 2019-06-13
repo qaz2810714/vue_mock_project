@@ -9,6 +9,10 @@ export default {
     attrs:{
         createTime:{
             type:baseType.datetime
+        },
+        gramWeight:{
+            type:baseType.decimal,
+            summary:true
         }
     }
 }

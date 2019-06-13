@@ -19,7 +19,7 @@
           <pm_toolButton
             ref="search"
             btnName="搜索"
-            :btnClickFunc="search"
+            :btnClickFunc="queryData"
             btnIcon="el-icon-circle-plus-outline"
           ></pm_toolButton>
           <pm_toolButton
@@ -50,7 +50,6 @@
       <metro_page_box_body>
         <pm_table
           ref="pmTable"
-          tableKey="NoteWhsInManage-pmTable"
           :reload="afterSetting"
           v-if="reload"
           :entity="config.entity"
@@ -71,7 +70,7 @@
           <pm_column prop="modifier" label="修改人" width="160"></pm_column>
           <pm_column prop="modifyTime" label="修改时间" width="160"></pm_column>
         </pm_table>
-        <pm_pagination ref="pager" :totalSize="totalSize" :queryData="getList"></pm_pagination>
+        <pm_pagination ref="pager" :total="totalSize" :queryFunc="getList"></pm_pagination>
       </metro_page_box_body>
     </metro_page_box>
     <div v-show="false">
@@ -101,6 +100,7 @@ import commonUtil from "@/common/utils/CommonUtils";
 import printJS from "print-js";
 import pm_context_menu from "@/components/common/menu/pm_context_menu";
 import barCodePrint from "./BarCodePrint";
+import testEntity from "@/common/entities/entity";
 export default {
   mixins: [tableReload],
   components: {
@@ -125,21 +125,18 @@ export default {
       dataSource: [],
       totalData: null,
       config: {
-        entity: metadata.wmsIn,
+        entity: testEntity,
         allowEdit: false,
         multiple: true,
         dbclick: this.editTab,
       },
-      totalSize: {
-        type: Number,
-        default: 0
-      },
+      totalSize: 0,
       formModel:Object,
       singleSelectData:Array
     };
   },
   mounted() {
-
+    this.queryData();
   },
   created(){
     this.formModel = {};
@@ -158,9 +155,6 @@ export default {
       //     _this.$refs.print.printDiv(entity);
       //   }
       // );
-    },
-    search:function(){
-      console.log(this.formModel);
     },
     queryData: function() {
       var $this = this;
@@ -235,8 +229,9 @@ export default {
      * 获取所有的查询数据
      */
     getData(callback,page,size) {
-      var param = this.$refs.pm_search.getParam();
-      this.$commonUtil.handler.packNoHander(param);
+      // var param = JSON.parse(JSON.stringify())
+      // this.$commonUtil.handler.packNoHander(param);
+      let param = {};
       param.page = {
         "current" : page||0,
         "size" : size||100000
