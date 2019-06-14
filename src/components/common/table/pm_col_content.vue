@@ -61,13 +61,6 @@
           :value="item[config.key]"
         ></el-option>
       </el-select>
-      <pm_stackTreeSelect
-        v-else-if="editControl.type == 'stackSelect'"
-        :canClickParent="false"
-        :dataTree="dataTree"
-        v-bind:whsRoomId.sync="row[parentPropName]"
-        v-bind:whsAreaId.sync="row[childPropName]"
-      ></pm_stackTreeSelect>
     </span>
     <!-- </lazy-component> -->
   </vue-lazy-component>
@@ -76,20 +69,14 @@
 <script>
 import componentUtil from "../../../common/utils/ComponentUtil";
 import filterExtend from "../../../common/utils/FilterExtend";
-import pm_stackTreeSelect from "@/components/common/treeSelect/pm_stackTreeSelect";
-import { strictEqual } from "assert";
-import convertMetadata from "@/common/entities/ConvertMetadata";
-let { baseType, dicEnum } = convertMetadata;
 export default {
   name: "pm_col_content",
   mixins: [filterExtend],
-  components: {
-    pm_stackTreeSelect
-  },
   props: {
     editControl: Object,
     row: Object,
     pk: Number,
+    blur:Function,
     tableConfig: Object,
     cellCanEdit: Function,
     canEdit: true,
@@ -97,19 +84,8 @@ export default {
     required: { type: Boolean, default: false }, //是否必填
     getDisplayText: Function,
     change: Function, //值选中事件
-    watchField: String, //监听字段
     calcEditControl: Function, //计算编辑属性
-    notifyColWidthChange:Function, //通知table列宽改变
     placeholder: String,
-    dataTree: Array,
-    parentPropName: {
-      type: String,
-      default: "whsRoomId"
-    },
-    childPropName: {
-      type: String,
-      default: "whsAreaId"
-    },
     min: { type: Number, default: 0 },
     max: { type: Number, default: Number.MAX_SAFE_INTEGER },
     step: { type: Number, default: 1 }
@@ -124,21 +100,9 @@ export default {
       precision: 0,
       viewport: null,
       dataSource: [],
-      notifyObj: {
-        win: this,
-        callback: (cache, win) => {
-          if (win.realCanEdit) {
-            win.calcConfig(true);
-          }
-        }
-      }
     };
   },
   computed: {
-    watchVal() {
-      if (this.watchField == null) return null;
-      return this.row[this.watchField];
-    },
     //计算属性值
     rootConfig() {
       return this.$parent.$parent.$parent.useConfig;
@@ -148,23 +112,13 @@ export default {
     },
     displayText() {
       var val = this.getDisplayText(this.row, this.prop);
-      this.notifyWidth(val);
       return val;
     }
-  },
-  /**
-   * 挂载完成事件
-   */
-  mounted() {
-    this.notifyWidth(this.displayText);
   },
   /**
    * 监听事件
    */
   watch: {
-    watchVal(val, oldVal) {
-      this.watchChange();
-    },
     row: {
       handler: function(val, oldVal) {
         //判断是否需要调整可编辑性
@@ -183,18 +137,6 @@ export default {
    * 方法
    */
   methods: {
-    notifyWidth:function(val){
-      if (this.tableConfig.autofit && this.$refs.showContent && !this.realCanEdit) {
-        var width = this.$refs.showContent.offsetWidth + 30;
-        //通知table列宽变化
-        this.notifyColWidthChange(width);
-      }
-    },
-    watchChange: function() {
-      //监听值发生改变，则重新计算配置信息
-      this.calcConfig(true);
-    },
-    emptyFunc: function() {},
     calcConfig: function(reCalc) {
       if (this.calcEditControl && reCalc) {
         var $this = this;
@@ -264,13 +206,6 @@ export default {
     );
     this.viewport = this.$parent.$parent.$parent.$el;
     var $this = this;
-    this.$cacheUtil.addColumnListener(this.notifyObj);
   },
-  /**
-   * 摧毁时移除监听事件
-   */
-  destroyed() {
-    this.$cacheUtil.removeColumnListener(this.notifyObj);
-  }
 };
 </script>

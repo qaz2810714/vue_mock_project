@@ -13,27 +13,12 @@
       @row-dblclick="handleRowDblClick"
       @row-click="handleRowClick"
       @selection-change="handleSelectionChange"
-      @header-dragend="handleHeaderDragend"
     >
-      <el-table-column type="expand" v-if="useConfig.extendConfig">
-        <template slot-scope="props">
-          <span class="expand-menu">调整前数据</span>
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item
-              v-for="(item,index) in useConfig.extendConfig.props"
-              :key="index"
-              :label="item.label"
-              class="myItem"
-            >
-              <span>{{ getDisplayText(props.row[useConfig.extendConfig.field],item.prop) }}</span>
-            </el-form-item>
-          </el-form>
-        </template>
+      <el-table-column type="expand" v-if="useConfig.expand">
       </el-table-column>
       <el-table-column align="center" type="index" label="序号" fixed :index="indexMethod"></el-table-column>
       <el-table-column type="selection" v-if="useConfig.multiple"></el-table-column>
       <slot></slot>
-      <el-table-column min-width="20" v-if="config.autofit"></el-table-column>
     </el-table>
     <v-contextmenu ref="pmContextMenu">
       <v-contextmenu-item @click="openColSetting">
@@ -57,10 +42,11 @@ export default {
   name: "pm_table",
   components: { pm_column },
   props: {
-    tableKey: String,
-    reload: Function,
+    rightClick: {
+      type:Boolean,
+      default:false
+    },
     dataSource: Array,
-    totalData: Array,
     bottomHeight: {
       type: Number,
       default: 164
@@ -75,12 +61,12 @@ export default {
           multiple: false, //允许多选
           sortable: true, //字段可排序
           height: 200, //默认高度
-          autofit: false, //是否为自动适配列
-          extendConfig: null //扩展列表配置[{prop:"",label:""}]
+          extendConfig: null, //扩展列表配置[{prop:"",label:""}]
+          dbclick: null,
+          change:null,//值改变事件
         };
       }
     },
-    dbclick: Function
   },
   computed: {
     allowEdit() {
@@ -89,9 +75,6 @@ export default {
     tableCls() {
       return this.config.allowEdit ? "pmtable pmtable28" : "pmtable pmtable23";
     },
-    allowColSetting() {
-      return this.tableKey;
-    }
   },
   mounted() {
     //初始化右键菜单
@@ -116,18 +99,6 @@ export default {
       },
       deep: true
     },
-    //TODO:监控数据源改变，设置首行选中
-    dataSource: {
-      handler: function(val, oldval) {
-        // if (val != null && val.length > 0) {
-        //   this.$refs["multipleTable"].setCurrentRow(val[0]);
-        // }
-        if (this.allowColSetting) {
-          this.calcTableCols();
-        }
-      },
-      deep: true
-    }
   },
   data() {
     return {
@@ -135,27 +106,10 @@ export default {
       sortCols: [],
       useConfig: {},
       tableHeight: 200,
-      notifyObj: {
-        win: this,
-        callback: (cache, win) => {
-          win.useConfig.dicCache = cache;
-        }
-      }
     };
   },
   created() {
     this.useConfig = this.calcConfig();
-    this.$cacheUtil.addTableListener(this.notifyObj);
-    if (this.allowColSetting) {
-      //从缓存中取配置信息(默认值为[])
-      var cacheCols = this.$cacheUtil.getCache(tableSettingkey) || {};
-      var tableSetting = cacheCols[this.tableKey] || {};
-      var cols = tableSetting.cols || [];
-      this.calcTableCols(cols);
-    }
-  },
-  destroyed() {
-    this.$cacheUtil.removeTableListener(this.notifyObj);
   },
   methods: {
     //------------------------------------------------
@@ -163,9 +117,8 @@ export default {
      * 初始化右键菜单
      */
     initContextMenu() {
-      if (!this.allowColSetting) return;
       //不包含reload方法，则不用启用右键菜单
-      if (!this.reload) return;
+      if(!this.rightClick) return;
       //右键菜单指定挂接位置
       var tableHead = this.$refs.multipleTable.$refs.tableHeader;
       var el = tableHead.$el,
@@ -180,161 +133,22 @@ export default {
       var cols = this.getTableCols()
         .filter(a => a.componentOptions && a.componentOptions.propsData)
         .map(a => a.componentOptions.propsData);
-      this.$layer.iframe({
-        content: {
-          content: pm_col_setting, //传递的组件对象
-          parent: this, //当前的vue对象
-          data: {
-            btnSave: this.saveSetting,
-            tableKey: this.tableKey,
-            items: JSON.stringify(cols) //过滤条件
-          } //props
-        },
-        area: ["600px", "600px"],
-        shadeClose: false,
-        title: "列设置"
-      });
+      // this.$layer.iframe({
+      //   content: {
+      //     content: pm_col_setting, //传递的组件对象
+      //     parent: this, //当前的vue对象
+      //     data: {
+      //       btnSave: this.saveSetting,
+      //       tableKey: this.tableKey,
+      //       items: JSON.stringify(cols) //过滤条件
+      //     } //props
+      //   },
+      //   area: ["600px", "600px"],
+      //   shadeClose: false,
+      //   title: "列设置"
+      // });
     },
-    /**
-     * 处理列宽改变
-     */
-    handleHeaderDragend(newWidth, oldWidth, column, event) {
-      if (!this.tableKey) return;
-      var key = tableSettingkey;
-      //将最新的宽度保存到缓存中
-      var cacheCols = this.$cacheUtil.getCache(key) || {};
-      var colSetting = cacheCols[this.tableKey] || {};
-      var cols = colSetting.cols || [];
-      //保存设置信息
-      var col = cols.find(a => a.prop == column.property);
-      if (col) {
-        col.width = newWidth + "";
-      } else {
-        cols.push({
-          prop: column.property,
-          width: newWidth + "",
-          label: column.label,
-          hidden: false
-        });
-      }
-      this.baseSaveSetting(cols);
-    },
-    //------------------------------------------------
-    /**
-     * 计算table的列信息
-     */
-    calcTableCols(cols) {
-      if (cols) {
-        //从缓存中读取该table的自定义设置
-        this.sortCols = cols;
-      }
-      //调整table slots字段的顺序
-      var columns = this.$slots.default.filter(a => a.tag);
-      var newColumns = [];
-      //按排好的顺序进行加载
-      this.sortCols.forEach(sortCol => {
-        var col = columns.find(
-          a => a.componentOptions.propsData.prop == sortCol.prop
-        );
-        if (!col) return;
-        if (sortCol.hidden) return;
-        col.componentOptions.propsData.width = sortCol.width;
-        newColumns.push(col);
-      });
-      //将columns中多出来的列添加进来
-      var sortProps = this.sortCols.map(a => a.prop);
-      var added = columns.filter(
-        a => !sortProps.includes(a.componentOptions.propsData.prop)
-      );
-      newColumns = newColumns.concat(added);
-      this.$slots.default = newColumns;
-    },
-    /**
-     * 设置界面保存方法
-     */
-    saveSetting(cols, callback) {
-      this.baseSaveSetting(cols, callback);
-      //重新加载table控件
-      this.reload(cols);
-    },
-    /**
-     * 基础保存方法
-     */
-    baseSaveSetting(cols, callback) {
-      var key = tableSettingkey;
-      //1.数据保存到缓存+数据库中
-      var tableKey = this.tableKey;
-      // 1. 保存到缓存中
-      var cacheCols = this.$cacheUtil.getCache(key) || {};
-      if (cacheCols[tableKey] == null) {
-        cacheCols[tableKey] = {};
-      }
-      cacheCols[tableKey].cols = cols;
-      this.$cacheUtil.setCache(key, cacheCols);
-      //2. 设置完成回调
-      if (callback) {
-        callback(cols);
-      }
-      // 3. 把配置信息保存到数据库
-      var obj = cacheCols[tableKey];
-      var obj = {
-        id: obj.id,
-        componentKey: this.tableKey,
-        configJson: JSON.stringify(cols)
-      };
-      if (obj.id == null) {
-        obj.userId = this.$cacheUtil.getUser().userId;
-        obj.configType = "table";
-        this.$httpUtil.post(
-          "/userUiSetting/add",
-          obj,
-          data => {
-            //新增成功 需要更新缓存
-            cacheCols[tableKey].id = data.id;
-            cacheCols[tableKey].configType = obj.configType;
-            this.$cacheUtil.setCache(key, cacheCols);
-          },
-          false,
-          false
-        );
-      } else {
-        //修改
-        this.$httpUtil.post(
-          "/userUiSetting/update",
-          obj,
-          data => {
-            //更新完成
-          },
-          false,
-          false
-        );
-      }
-    },
-    /**
-     * 更新数据源
-     */
-    updateDatasource: function(data) {
-      //this.dataSource = data;
-    },
-    //------------------------------------------------
-    /**
-     * 更新数据
-     */
-    updateRow: function(callback) {
-      if (this.dataSource != null && callback) {
-        var $this = this;
-        for (var i = 0; i < this.dataSource.length; i++) {
-          var row = this.dataSource[i];
-          callback(row, i);
-          //定义双向绑定
-          for (var p in row) {
-            var temp = row[p];
-            delete row[p];
-            this.$set(row, p, temp);
-          }
-        }
-      }
-    },
+    
     /**
      * 获取table高度
      */
@@ -363,6 +177,9 @@ export default {
     getRowKeyHandler: function(row) {
       return row.id;
     },
+    /**
+     * 
+     */
     calcConfig: function() {
       return {
         ...{
@@ -372,9 +189,8 @@ export default {
           multiple: false, //允许多选
           showSummary: true, //默认值为 true
           sortable: true, //字段可排序
-          autofit: false, //是否为自动适配
           height: 200, //默认高度
-          extendConfig: null //扩展列表配置[{prop:"",label:""}]
+          expand: false //扩展列表配置[{prop:"",label:""}]
         },
         ...this.config
       };
@@ -392,9 +208,15 @@ export default {
       );
       return displayText;
     },
+    /**
+     * 索引计算方法
+     */
     indexMethod(index) {
       return index + 1;
     },
+    /**
+     * 列单击事件
+     */
     handleRowDblClick(row, event) {
       if (this.config.dbclick != null) {
         this.config.dbclick(row, event);
@@ -438,6 +260,9 @@ export default {
     getSelectedRows: function() {
       return this.selectedRows;
     },
+    getSelectedRow: function(){
+      return this.currentRow;
+    },
     //选中行返回
     handleSelectionChange(val) {
       this.selectedRows = val;
@@ -474,12 +299,6 @@ export default {
           var label = propConfig.label;
           var val = item[prop];
           if (isEmpty(val)) {
-            if (prop == "whsCalcStackId") {
-              if (isEmpty(item.whsRoomId) && isEmpty(item.whsAreaId)) {
-                rowMsg.push(label + "为必填项，不能为空!");
-              }
-              return;
-            }
             rowMsg.push(label + "为必填项，不能为空!");
           }
         });
@@ -498,7 +317,7 @@ export default {
      */
     getSummaries(param) {
       const { columns, data } = param;
-      var allData = this.totalData || data;
+      var allData = data;
       const sums = [];
       var $this = this;
       columns.forEach((column, index) => {
