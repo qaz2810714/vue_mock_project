@@ -13,50 +13,19 @@
               <pm_form_item labletext="多选类型" name="selectBatchId" :span="6" xtype="select_batch" lableWidth="90px" :selectDataList="singleSelectData"></pm_form_item>
               <pm_form_item labletext="测试数据配置化" name="cstId" :span="6" xtype="search_select_input" lableWidth="130px"></pm_form_item>
               <pm_form_item labletext="测试数据配置化2" name="brandId" :span="6" xtype="select" lableWidth="135px"></pm_form_item>
-              <pm_form_item labletext="复选框" name="checkboxGroupId" :span="6" xtype="checkbox_group" lableWidth="90px"></pm_form_item>
+              <!-- <pm_form_item labletext="复选框" name="checkboxGroupId" :span="6" xtype="checkbox_group" lableWidth="90px"></pm_form_item> -->
           </pm_form>
         <pm_tool_bar>
-          <pm_toolButton
-            ref="search"
-            btnName="搜索"
-            :btnClickFunc="queryData"
-            btnIcon="el-icon-circle-plus-outline"
-          ></pm_toolButton>
-          <pm_toolButton
-            ref="addBtn"
-            btnName="新增"
-            btnIcon="el-icon-circle-plus-outline"
-          ></pm_toolButton>
-           <!-- <pm_toolButton
-              ref="viewQuality"
-              btnName="维护质检信息"
-              btnIcon="el-icon-circle-plus-outline"
-              :btnClickFunc="viewQuality"
-            ></pm_toolButton> -->
-          <pm_toolButton
-            btnName="作废"
-            btnIcon="el-icon-delete"
-            :btnClickFunc="deleteInfo"
-          ></pm_toolButton>
+          <pm_toolButton ref="search"  btnName="搜索" :btnClickFunc="queryData" btnIcon="el-icon-circle-plus-outline"></pm_toolButton>
+          <pm_toolButton ref="addBtn" btnName="新增" btnIcon="el-icon-circle-plus-outline"></pm_toolButton>
         </pm_tool_bar>
       </metro_page_box_body>
     </metro_page_box>
-
-    <!-- <pm_context_menu ref="pmContextMenu" colsKey='whsinManage'></pm_context_menu> -->
-
     <!-- 数据展示区域 -->
     <metro_page_box>
       <!-- body内容区域 -->
       <metro_page_box_body>
-        <pm_table
-          ref="pmTable"
-          :reload="afterSetting"
-          v-if="reload"
-          :entity="config.entity"
-          :dataSource="dataSource"
-          :totalData="totalData"
-          :config="config"
-        >
+        <pm_table ref="pmTable" :reload="afterSetting" v-if="reload" :entity="config.entity" :dataSource="dataSource" :totalData="totalData" :config="config">
           <pm_column prop="whsInCode" label="入库单号" width="200"></pm_column>
           <pm_column prop="clientName" label="客户名称" width="180"></pm_column>
           <pm_column prop="brand" label="品名" width="160"></pm_column>
@@ -143,20 +112,8 @@ export default {
     this.singleSelectData = [{key:1,value:"aaa"},{key:2,value:"bbb"}];
   },
   methods: {
-    printInfo: function() {
-      let _this = this;
-      let row = this.getSelectRow();
-      _this.$refs.print.printDiv(row);
-      // this.$commonUtil.getDetailEntity(
-      //   "wmsin/getInDetailByMainId",
-      //   { mainId: row.id },
-      //   row,
-      //   function(entity) {
-      //     _this.$refs.print.printDiv(entity);
-      //   }
-      // );
-    },
     queryData: function() {
+      console.log(this.formModel);
       var $this = this;
       //1.查询时先获取所有的数据
       this.getData(data => {
@@ -171,59 +128,6 @@ export default {
         table.dataSource = data.records;
         table.totalSize = data.total;
       },page,size);
-    },
-    //作废数据
-    deleteInfo() {
-      //获取当前选中数据id
-      let row = this.getSelectRow();
-      if (row.status != 1) {
-        this.$message({
-          message: "只能作废待入库状态的单据！",
-          type: "fail"
-        });
-        return;
-      }
-      let table = this;
-      this.$confirm("确认作废选中的入库单?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        //发送请求删除数据
-        httpUtil.post("whsin/deleteInInfo", row, data => {
-          this.$message({
-            message: "作废入库单成功",
-            type: "success"
-          });
-          table.queryData();
-        });
-      });
-    },
-    auditInfo() {
-      //获取当前选中数据id
-      let row = this.getSelectRow();
-      if (row.status != 1) {
-        this.$message({
-          message: "只能审核待入库状态的单据！",
-          type: "fail"
-        });
-        return;
-      }
-      let table = this;
-      //发送请求审核数据
-      this.$confirm("确认审核选中的入库单?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        httpUtil.post("whsin/auditInInfo", row, data => {
-          this.$message({
-            message: "审核入库单成功",
-            type: "success"
-          });
-          table.queryData();
-        });
-      });
     },
     /**
      * 获取所有的查询数据
@@ -242,17 +146,6 @@ export default {
         if (callback) {
           callback(data);
         }
-      });
-    },
-    /**
-     * 导出方法
-     */
-    exportFunc: function() {
-      var $this = this;
-      this.getData(data => {
-        //获取表单的信息
-        var table = $this.$refs.pmTable;
-        $this.$commonUtil.cloudExport($this, data.records, table, "入库单列表");
       });
     },
     //获取选中行
