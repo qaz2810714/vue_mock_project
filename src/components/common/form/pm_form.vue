@@ -5,6 +5,7 @@
                <slot></slot>
            </el-row>
        </el-form>
+    <el-button type="primary"  @click="resetParam" >重置</el-button>
     </div>
 </template>
 
@@ -19,6 +20,10 @@ export default {
         entity:Object,
         change:Function,
         formReadOnly:{type:Boolean,default:false},//全表单禁用开关
+    },
+    model:{
+        prop:'model',
+        event:'updateModel'
     },
     computed: {
     },
@@ -40,6 +45,12 @@ export default {
         }
     },
     methods: {
+        resetParam:function(){
+            for(var item in this.model){
+                this.model[item] = ''
+            }
+            this.$emit('updateModel',this.model);
+        },
         validate:function(curr,succ,fail){
             this.$refs.pmform.validate(              
                 (valid,validFields) => {

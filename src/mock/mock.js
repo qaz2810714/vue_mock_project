@@ -9,7 +9,7 @@ import baseData from './data/baseData'
 
 let _Users = Users;
 const Mock = require("mockjs")
-var serviceUrl = 'http://localhost:8088/api';
+var serviceUrl =  '/api';
 
 function success(dataJson,message){
   if(!message)
@@ -50,6 +50,7 @@ Mock.mock(serviceUrl+'/wmsin/viewPageList',function(req,res){
   let param = JSON.parse(req.body).data;
   let data = wmsInData
   let result = JSON.parse(JSON.stringify(data));
+  //对搜索条件进行数据过滤
   result.records = result.records.filter( a =>{
     let r = true;
     if(param.whsInCode){

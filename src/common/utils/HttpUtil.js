@@ -3,7 +3,6 @@ import md5 from 'js-md5';
 import cacheUtil from '../utils/CacheUtil'
 import { Loading,MessageBox } from 'element-ui';
 import { showLoading, hideLoading } from './loading';
-import '../../mock/mock.js'
 
 const parseEvironment = (hostname, domain) => {
     return hostname.substring(hostname.indexOf(domain) + domain.length, hostname.lastIndexOf('.'));
@@ -20,21 +19,15 @@ if(typeof window != 'undefined'){
     }
     console.log("环境"+environment);
     var protocol=window.location.protocol;
-    if (environment == 'mit') {
-        serviceUrl = protocol+"//wmsapi.pangmaoyuncangmit.com/industrialintelligence.cloudstore.pangmao.service/api/";
-    } else if (environment == 'test') {
+    if (environment == 'test') {
         serviceUrl = protocol+"//wmsapi.pangmaoyuncangtest.com/industrialintelligence.cloudstore.pangmao.service/api/";
     } else if (environment == 'uat') {
         serviceUrl = protocol+"//wmsapi.pangmaoyuncanguat.com/industrialintelligence.cloudstore.pangmao.service/api/";
-    } else if (hostname=='cloudstore.industrialintelligence.pangmaomiao.com') {
-        serviceUrl = "http://cloudstore.pangmao.zhaogang.com/industrialintelligence.cloudstore.pangmao.service/api/";
-    }else if (hostname=='www.pangmaoyuncang.com') {
-        serviceUrl = protocol+"//wmsapi.pangmaoyuncang.com/industrialintelligence.cloudstore.pangmao.service/api/";
     }
     //在MOCK环境下使用mock.js
-    else if(environment == "mock"){
+    else if(hostname == "localhost"){
         require ('../../mock/mock.js')
-        serviceUrl = ""
+        serviceUrl = "/api/"
     }
 }
 // if(hostname=="localhost"){
