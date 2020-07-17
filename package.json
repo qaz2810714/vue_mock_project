@@ -28,7 +28,7 @@
     "font-awesome": "^4.7.0",
     "html-entities": "^1.2.1",
     "js-md5": "^0.7.3",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "nprogress": "^0.2.0",
     "print-js": "^1.0.54",
     "v-contextmenu": "^2.8.0",
